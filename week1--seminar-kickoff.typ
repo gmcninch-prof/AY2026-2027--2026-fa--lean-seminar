@@ -9,7 +9,7 @@
 #import "@local/george:0.1.0": slides
 
 #show: slides.university-theme.with(
-    config-common(handout: false),
+    config-common(handout: true),
     config-info(
         title: [Formalization Seminar: Kickoff],
         author: [George McNinch],
@@ -136,30 +136,15 @@ def seq_limit (u : ℕ → ℝ) (ℓ : ℝ) :=
 
 == Suggested reading
 
+- from #link("https://leanprover-community.github.io/mathematics_in_lean/", "Mathematics in Lean")
+  - §2.3 ("Using Theorems and Lemmas") is
+     the most useful part of Ch. 2 for where we're headed -- the rest of
+    Ch. 2 you can skim or skip.
+  - Ch. 3 (Logic), through §3.6 ("Sequences and Convergence")
+  - Ch. 4 (Sets and Functions)
+  
 #pause
-- a gentle, no-install warm-up: the
-  #link("https://adam.math.hhu.de/")[Natural Number Game] -- builds tactic
-  and induction intuition in the browser
-#pause
-- when you're ready to install: Lean + mathlib (link already sent --
-  VS Code, then the Lean extension, then mathlib)
-#pause
-- from #emph[Mathematics in Lean]: §2.3 ("Using Theorems and Lemmas") is
-  the most useful part of Ch. 2 for where we're headed -- the rest of
-  Ch. 2 you can skim or skip. Then Ch. 3 (Logic), through §3.6
-  ("Sequences and Convergence"). Then Ch. 4 (Sets and Functions).
-#pause
-- try some of the exercises as you go -- no need to do all of them
-#pause
-- happy to help outside of meeting time too
+- try some of the exercises as you go
 
-= Logistics
 
-- weekly, Tuesdays 3:30 -- 4:20, JCC 302
-
-- see the seminar page:
-  #link("gmcninch.math.tufts.edu/pages/2026-Fall---lean-seminar.html")
-
-- some write-ups and materials will be posted to Proof Sketches
-  #link("gmcninch.math.tufts.edu/proof-sketches/") as we go
 
