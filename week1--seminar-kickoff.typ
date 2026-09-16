@@ -19,6 +19,8 @@
 )
 
 #slides.title-slide()
+#show link: it => text(fill: blue, underline(it))
+
 
 = Welcome
 
@@ -26,11 +28,8 @@
 
 #pause
 - proof assistant and _Lean_?
-#pause
 - a short live demo -- watch Lean check a proof
-#pause
 - where I'd like to head: formalizing some undergraduate analysis
-#pause
 - logistics
 
 = Proof assistants and Lean
@@ -77,16 +76,13 @@
 
 == A taste of what Lean looks like
 
-#pause
 ```lean
 -- a definition
 def append {α : Type} (xs ys : List α) : List α :=
   match xs with
   | []      => ys
   | z :: zs => z :: append zs ys
-```
-#pause
-```lean
+
 -- a theorem, and its proof
 theorem append_length {α : Type} (xs ys : List α) :
     (append xs ys).length = xs.length + ys.length := by
@@ -99,9 +95,6 @@ theorem append_length {α : Type} (xs ys : List α) :
 ```
 
 #pause
-
-- this example is small, but it already has a lot: a definition, a
-  statement, and an inductive proof.
 
 = Live demo
 
@@ -120,9 +113,9 @@ theorem append_length {α : Type} (xs ys : List α) :
 
 == The target: formalizing undergraduate analysis
 
-#pause
 - the plan for this seminar: work, together, toward formalizing pieces
   of the undergraduate analysis course
+
 #pause
 - here's the kind of statement we mean -- convergence of a sequence:
 ```lean
@@ -130,18 +123,16 @@ theorem append_length {α : Type} (xs ys : List α) :
 def seq_limit (u : ℕ → ℝ) (ℓ : ℝ) :=
   ∀ ε > 0, ∃ N, ∀ n ≥ N, |u n - ℓ| ≤ ε
 ```
+
 #pause
 - and a real theorem about it -- the squeeze theorem:
-```lean
-theorem squeeze (hu : seq_limit u ℓ) (hw : seq_limit w ℓ)
-    (h : ∀ n, u n ≤ v n) (h' : ∀ n, v n ≤ w n) :
-    seq_limit v ℓ := by
-  sorry
-```
-#pause
-- *that* `sorry` is where the semester's work lives -- formalizing proofs
-  you already know, and discovering exactly what they demand once every
-  step must be made fully explicit
+  ```lean
+  theorem squeeze (hu : seq_limit u ℓ) (hw : seq_limit w ℓ)
+      (h : ∀ n, u n ≤ v n) (h' : ∀ n, v n ≤ w n) :
+      seq_limit v ℓ := by
+    sorry
+  ```
+
 
 == Suggested reading
 
@@ -172,9 +163,3 @@ theorem squeeze (hu : seq_limit u ℓ) (hw : seq_limit w ℓ)
 - some write-ups and materials will be posted to Proof Sketches
   #link("gmcninch.math.tufts.edu/proof-sketches/") as we go
 
-= Questions
-
-== Questions?
-
-#pause
-- what would make this useful for *you*?
