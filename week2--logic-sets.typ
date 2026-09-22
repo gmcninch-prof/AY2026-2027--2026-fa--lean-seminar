@@ -7,7 +7,7 @@
 #import "@local/george:0.1.0": slides
 
 #show: slides.university-theme.with(
-    config-common(handout: false),
+    config-common(handout: true),
     config-info(
         title: [Formalization Seminar: Logic and Sets],
         author: [George McNinch],
@@ -20,44 +20,67 @@
 
 #slides.title-slide()
 
-= Welcome back
+= Propositions
 
-== Plan for today
+== Representing propositions in a computer language
 
-#pause
-- a quick word on `Bool` vs `Prop`
-#pause
-- negation: what `¬P` actually *is*
-#pause
-- automating negation: `push_neg`
-#pause
-- punchline, live: De Morgan for sets
-
-= `Bool` vs `Prop`
-
-== Why do we need this at all?
-
-#pause
-- last time: Lean *checked* a proof, and it felt like a compilation
+- last time: we saw that Lean *checked* a proof, and it felt like a compilation
   step
+ 
 #pause
 - but what, exactly, is it checking?
+ 
 #pause
-- some statements a computer really can just settle by calculation --
-  `2 + 2 = 5` is a finite check
+- some statements a computer really can just settle by calculation 
+
+  `2 + 3 = 5`  a finite check
+
 #pause
 - most of what we actually care about can't be settled that way:
   "there are infinitely many primes," "this sequence converges,"
   "these two groups are isomorphic" -- there's no brute-force
   computation that decides these
+
 #pause
-- Lean's answer: represent a statement as a *type* (`Prop`), and "this
-  is true" means *producing a term of that type* -- a genuine
-  certificate, not a computed bit
+- the solution is what is known as _Type Theory_
+
+== Naive overview of types
+
+- recall from "computer science" that can represents different sorts of data with `types`
+
+  for example, we have natural numbers
+
+  `5 : ℕ`, rational numbers `1/2 : ℚ`, strings `"foo" : String`
+
+  Lists of rational numbers: `[ 1, 1/2 ] : List ℚ`
+
+
+  Functions `u : ℕ → ℝ` ("sequences" in this case)
+
+  Boolean value `true : Bool` and `false : Bool`
+
 #pause
-- this is the same idea behind last time's demo: `append_length`
+
+- here is the pattern: for a type `t`, we can consider terms `x` of
+  type `t`, and the notation `x : t` means that `x` is a term of type
+  `t`.
+
+== Naive overview of the type `Prop`
+
+- We want to consider _propositions_ and be able to reflect their
+  correctness computationally.
+
+- The idea: introduce a *type* `Prop` of Propositions
+
+#pause
+- If `a : Prop` then a term `t : a` is a _proof_ of `a` or a _certificate_ of `a`.
+
+#pause
+- we saw this in last time's demo: `append_length`
   wasn't checked by running anything -- it was checked by verifying
   the *proof term* has the right type
+
+  and the *proof term* is obtained by coding it in Lean (either directly, or using _tactics_)
 
 == Two different kinds of things
 
@@ -71,110 +94,147 @@
   You *compute* a `Bool`.
 #pause
 - `Prop` is the type of *statements*. To settle one you give a
-  *proof*, not a value out of a two-element type.
+  *proof* 
 #pause
 ```lean
 example : ¬ (2 + 2 = 5) := by decide
 ```
 #pause
-- `decide` can settle statements like this automatically, because
+- the tactic `decide` actually produces a proof term `t : ¬(2+2 = 5)`
+
+  `decide` can settle statements like this automatically, because
   they're the kind of statement a computer can just check by
-  calculation. (More on how, later in the semester.)
+  calculation.
 
-= Negation
+#pause
+- but! There are lots of propositions which aren't `Decidable`.
 
-== What is `¬P`, really?
+  e.g. for `a : ℝ`, the proposition `a = 0 : Prop` is not decidable.
+
+  Indeed, To Lean, a real number is represented by a Cauchy sequence `ℕ → ℚ`
+
+== Implication
+
+- Given `p q : Prop`, the type of functions `p → q` is again a prop:
+
+  `p → q : Prop`
+
+- Let's think through why:  
+
+  a term `f : p → q` should be thought of as a function from "proofs of `p`" to "proofs of `q`"
+
+- so in fact `p → q` can be read as "`p` implies `q`"
+
+== Modus Ponens
+
+Here is how to state and prove _modus ponens_ in Lean:
+
+```lean
+theorem modus_ponens {p q : Prop} : (f: p → q) → (h : p)  → q :=
+  fun f h => f h
+```
+
+Or slightly more readably
+
+```lean
+theorem modus_ponens' {p q : Prop} : (f: p → q) → (h : p)  → q := by
+  intro f h 
+  exact f h
+```
+
+==  Conjunction
+
+Given `p q : Prop`, we get a proposition `p ∧ q : Prop` which should
+be true precisely when both `p` and `q` are true.
+
+Mechanically, this is achieved in Lean by
+
+```lean
+example {p q : Prop} (hp : p) (hq : q) : p ∧ q :=
+  And.intro hp hq
+```
+
+In practice, often `And.intro` is used under the hood by a tactic.
+
+
+```lean
+example {p q : Prop} (hp : p) (hq : q) : p ∧ q := by
+  constructor -- this tactic produces *two* goals
+  · exact hp
+  · exact hq
+```
+
+== Disjunction
+
+Given `p q : Prop`, we get a proposition `p ∨ q : Prop` which should
+be true precisely when either `p` or `q` is true.
+
+We need more _introduction rules_ to handle disjunction.
+
+```lean
+variable (p q : Prop)
+example (hp : q) : p ∨ q := Or.intro_left hp
+example (hq : q) : p ∨ q := Or.intro_right p hq
+```
+
+== Negation
+
+- in contrast to the `Bool` values `true` and `false` there are
+  _types_
+
+  `True : Prop` and `False : Prop`.
+
+  The type `True` is a "trivially provable" proposition. In Lean,
+  its proof term (certificate) is called
+
+  `True.intro : True`
+
+  The type `False` has no terms.
 
 #pause
 - `¬P` is *notation* for `P → False`
 #pause
 - so "prove `¬P`" means: construct a function taking a hypothetical
   proof of `P` and producing a proof of `False`
+
+
+== Absurd
+
+Note that `False` implies *anything*
+
+```lean
+#check False.elim
+-- False.elim.{u} {C : Sort u} (h : False) : C
+```
+
+```lean
+#check absurd
+-- absurd.{v} {a : Prop} {b : Sort v} (h₁ : a) (h₂ : ¬a) : b
+```
+
 #pause
 ```lean
-example : ¬ (1 = 0) := by
-  intro h        -- h : 1 = 0, goal is now False
-  exact absurd h (by norm_num)
+example (a b : ℝ) (h : a = b) (k : a ≠ b) : 1 = 0 :=
+  absurd h k 
 ```
-#pause
-- `intro h` is the moment to linger on: it's the *same* `intro` you'd
-  use on any implication -- nothing special about negation as a
-  connective, it's just an implication whose target happens to be
-  `False`
-#pause
-- this is exactly proof-by-contradiction, stated precisely: "assume
-  `P`, derive an absurdity" *is* "give a term of type `P → False`"
 
-== Why is `False` absurd?
 
-#pause
-- `False` is the type with *no constructors*
-#pause
-- so having a term of type `False` is absurd by construction: from
-  one, you can derive anything (`h.elim`, `absurd`, `contradiction`)
-#pause
-- that's what closes the loop -- it's *why* `P → False` genuinely
-  captures "`P` cannot hold"
+== Demo examples
 
-== A note on names
-
-#pause
-- `Prop` has its own `True` and `False` -- these are *types*, not the
-  `Bool` values from earlier
-#pause
-- `False` : no constructors (as before -- absurd)
-#pause
-- `True` : one trivial constructor, `True.intro` -- proving it needs
-  no information at all
-#pause
-- the capitalization is the tell: `True`/`False` (Prop) vs
-  `true`/`false` (Bool) -- you'll see both in Mathlib source, so it's
-  worth having the distinction ready
-
-= Automating negation
-
-== `push_neg`: De Morgan for propositions
-
-#pause
-- pushing a negation through by hand (`intro`, `cases`, ...) works,
-  but gets tedious once quantifiers and connectives stack up
-#pause
 ```lean
-example (P Q : Prop) : ¬ (P ∨ Q) ↔ ¬P ∧ ¬Q := by
-  push_neg
-  -- goal is closed, or reduced to something trivial
+import Mathlib
+/-! demo -/
+
+example {x y : ℝ} (h : x ≤ y ∧ x ≠ y) : ¬y ≤ x := by
+  rcases h with ⟨h₀, h₁⟩
+  contrapose! h₁
+  exact le_antisymm h₀ h₁
+
+
+example {m n k : ℕ} (h : m ∣ n ∨ m ∣ k) : m ∣ n * k := by
+  rcases h with ⟨a, rfl⟩ | ⟨b, rfl⟩
+  · rw [mul_assoc]
+    apply dvd_mul_right
+  · rw [mul_comm, mul_assoc]
+    apply dvd_mul_right
 ```
-#pause
-- `push_neg` mechanically pushes negation through `∀`, `∃`, `∧`, `∨`
-  -- this *is* De Morgan, just at the level of propositions
-#pause
-- (we're working classically throughout, so `¬¬P → P` is fair game --
-  `push_neg`, `by_contra`, etc. rely on this)
-
-= Punchline, live
-
-== De Morgan for sets
-
-#pause
-- same shape of statement, now for sets:
-```lean
-example (s t : Set α) : (s ∪ t)ᶜ = sᶜ ∩ tᶜ := by
-  ext x
-  simp [Set.mem_union, Set.mem_compl_iff]
-  push_neg
-  tauto
-```
-#pause
-- switching to the editor now -- let's build this up piece by piece
-#pause
-- watch for: `ext x` turns a *set equality* into an *iff of
-  memberships* -- this is where "sets" quietly becomes "logic" again
-
-// (Live coding happens outside the slide deck. Return here afterward.)
-
-= Wrap
-
-== Questions?
-
-#pause
-- where did the connection between logic and sets feel surprising?
