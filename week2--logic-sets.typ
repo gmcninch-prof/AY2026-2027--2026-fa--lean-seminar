@@ -111,11 +111,11 @@ example : ¬ (2 + 2 = 5) := by decide
 
   e.g. for `a : ℝ`, the proposition `a = 0 : Prop` is not decidable.
 
-  Indeed, To Lean, a real number is represented by a Cauchy sequence `ℕ → ℚ`
+  Indeed, to Lean, a real number is represented by a Cauchy sequence `ℕ → ℚ`
 
 == Implication
 
-- Given `p q : Prop`, the type of functions `p → q` is again a prop:
+- Given `p q : Prop`, the type of functions `p → q` is again a `Prop`:
 
   `p → q : Prop`
 
@@ -130,15 +130,15 @@ example : ¬ (2 + 2 = 5) := by decide
 Here is how to state and prove _modus ponens_ in Lean:
 
 ```lean
-theorem modus_ponens {p q : Prop} : (f: p → q) → (h : p)  → q :=
+theorem modus_ponens {p q : Prop} : (p → q) → p  → q :=
   fun f h => f h
 ```
 
 Or slightly more readably
 
 ```lean
-theorem modus_ponens' {p q : Prop} : (f: p → q) → (h : p)  → q := by
-  intro f h 
+theorem modus_ponens' {p q : Prop} : (p → q) → p  → q := by
+  intro f h  -- now `f : p → q` and `h : p`
   exact f h
 ```
 
@@ -173,7 +173,7 @@ We need more _introduction rules_ to handle disjunction.
 
 ```lean
 variable (p q : Prop)
-example (hp : q) : p ∨ q := Or.intro_left hp
+example (hp : p) : p ∨ q := Or.intro_left q hp
 example (hq : q) : p ∨ q := Or.intro_right p hq
 ```
 
