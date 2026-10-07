@@ -9,7 +9,7 @@
 #show: slides.university-theme.with(
     config-common(handout: true),
     config-info(
-        title: [Formalization Seminar: Logic and Sets],
+        title: [Formalization Seminar: Propositions],
         author: [George McNinch],
         date: datetime(year: 2026, month: 9, day: 22), // TODO: confirm actual date
         institution: [Tufts University],
