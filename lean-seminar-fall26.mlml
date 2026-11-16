@@ -1,0 +1,52 @@
+
+
+Course {
+  semester = Semester { ay = 2026 term = Fall }
+  title = "lean seminar"
+  description = "Lean Seminar"
+  sections = ["01"]
+  instructors = ["George McNinch"]
+  components = [
+    lecture
+  ]
+}
+
+
+;; info
+
+
+let orgDirectory    = "/home/george/org"
+
+let lectureLocation = "JCC 302"
+
+let lectureStartTime = "15:00"
+let lectureStopTime  = "16:00"
+
+;; course components
+
+;;--------------------------------------------------------------------------------
+;; lecture
+
+
+let topics = [
+    
+
+ 
+]
+
+
+let lecture = Appointment {
+  kind = Lecture
+  description = "course lecture"
+  sched = [
+    DowTufts {
+      dow = Tue
+      time = TimeRange {
+        start = lectureStartTime
+        stop = lectureStopTime
+      }
+      location = lectureLocation
+    }
+  ]
+  topics = topics
+}
